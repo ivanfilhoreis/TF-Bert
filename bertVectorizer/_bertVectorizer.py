@@ -65,7 +65,7 @@ class bertVectorizer():
                                             vocabulary=self.vocabulary)
 
             cv_trained = cv_vectorizer.fit_transform(df)
-            self.vocabulary = cv_trained.get_feature_names()
+            self.vocabulary = cv_vectorizer.get_feature_names()
 
         keybert_model = KeyBERT(model=self.kbert_model)
         weights_bert = []
