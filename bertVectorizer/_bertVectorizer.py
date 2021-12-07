@@ -72,9 +72,7 @@ class bertVectorizer():
 
         for item in df:
             items = []
-            keybert_result = sorted(keybert_model(item,
-                                                  candidates=self.vocabulary,
-                                                  top_n=len(df)))  # extract similarity
+            keybert_result = sorted(keybert_model.extract_keywords(item, candidates=self.vocabulary, top_n=len(df)))  # extract similarity
 
             for item in keybert_result:
                 items.append(item[1])
