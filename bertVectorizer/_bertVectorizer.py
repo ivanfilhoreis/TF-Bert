@@ -13,9 +13,9 @@ __all__ = ['bertVectorizer']
 
 
 class bertVectorizer():
-    r"""Convert a collection of raw documents to a matrix extracted from BERT resources. 
+    r"""Convert a collection of raw documents to a Pandas DataFrame extracted from BERT resources. 
 
-    This library is based on the KeyBERT and CountVectorizer libraries. We recommend that you read the documentation for both. 
+    The bertVectorizer uses CountVectorizer to build a list of keyword candidates and uses KeyBERT to identify the similarity between each candidate and the given sentence. We recommend that you read the documentation for both. 
 
     Parameters
     ----------
@@ -142,7 +142,6 @@ class bertVectorizer():
         self.max_features = max_features
         self.vocabulary = vocabulary
         self.kbert_candidates = kbert_candidates
-        self.kbert_model = kbert_model
         self.kbert_top_n = kbert_top_n
         self.kbert_min_df = kbert_min_df
         self.kbert_use_maxsum = kbert_use_maxsum
@@ -154,42 +153,40 @@ class bertVectorizer():
         self.kbert_seed_keywords = kbert_seed_keywords
         self.normalize = normalize
 
-    def fit_transform(self, df):
-        if self.vocabulary == 'keybert':
-            self.vocabulary = self.features_keybert(df)
-        else:
-            cv_vectorizer = CountVectorizer(lowercase=self.lowercase,
-                                            stop_words=self.stop_words,
-                                            ngram_range=self.ngram_range,
-                                            max_df=self.max_df,
-                                            min_df=self.min_df,
-                                            max_features=self.max_features,
-                                            vocabulary=self.vocabulary)
+        # CREATE THE KEYBERT MODEL
+        self.kbert_model = KeyBERT(model=kbert_model)
 
-            cv_trained = cv_vectorizer.fit_transform(df)
-            self.vocabulary = cv_vectorizer.get_feature_names()
+    def features_from_cv(self, data):
+        """[Use CountVectorizer to build a list of feature names]
 
-        keybert_model = KeyBERT(model=self.kbert_model)
-        weights_bert = []
+        Args:
+            data ([list]): [A list of texts]
 
-        for item in df:
-            items = []
-            keybert_result = sorted(keybert_model.extract_keywords(
-                item, candidates=self.vocabulary, top_n=len(self.vocabulary)))  # extract similarity
+        Returns:
+            [list]: [Return a list of feature names]
+        """
+        cv_vectorizer = CountVectorizer(lowercase=self.lowercase,
+                                        ngram_range=self.ngram_range,
+                                        stop_words=self.stop_words,
+                                        max_df=self.max_df,
+                                        min_df=self.min_df,
+                                        max_features=self.max_features,
+                                        vocabulary=self.vocabulary)
 
-            for item in keybert_result:
-                items.append(item[1])
+        cv_vectorizer.fit_transform(data)
 
-            weights_bert.append(items)
-        weights_bert = np.array(weights_bert)
-
-        df_bert = pd.DataFrame(columns=self.vocabulary, data=weights_bert)
-
-        return df_bert
+        return cv_vectorizer.get_feature_names()
 
     def features_keybert(self, text):
+        """[Use keybert to build a list of feature names]
 
-        kw_model = KeyBERT(self.kbert_model)
+        Args:
+            text ([list]): [A list of texts]
+
+        Returns:
+            [type]: [Return a list of feature names]
+        """
+        kw_model = self.kbert_model
         keys = list()
         result = 0
 
@@ -225,3 +222,36 @@ class bertVectorizer():
         print(vocabulary)
 
         return list(vocabulary)
+
+    def fit_transform(self, data):
+        """[summary]
+
+        Args:
+            data ([list]): [A list of texts]
+
+        Returns:
+            [Pandas DataFrame]: [return a dataframe of values representing the similarity between a candidate and the respective text]
+        """
+        if self.vocabulary == 'keybert':
+            self.vocabulary = self.features_keybert(data)
+        else:
+            self.vocabulary = self.features_from_cv(data)
+
+        keybert_model = self.kbert_model
+        weights_bert = []
+
+        for item in data:
+
+            keybert_result = sorted(keybert_model.extract_keywords(
+                item, candidates=self.vocabulary, top_n=len(self.vocabulary)))  # extract similarity
+
+            # create list of values representing the similarity of each word to text
+            items = []
+            for item in keybert_result:
+                items.append(item[1])
+
+            weights_bert.append(items)
+
+        df_bert = pd.DataFrame(columns=self.vocabulary, data=weights_bert)
+
+        return df_bert
