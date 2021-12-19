@@ -94,7 +94,7 @@ class bertVectorizer():
                 if token.is_alpha and token.lemma_ not in candidates:
                     candidates.append(token.lemma_)
         
-        return candidates
+        return sorted(candidates)
     
     def encode_data(self, data, candidates):
         """[summary]
@@ -124,7 +124,8 @@ class bertVectorizer():
             [Pandas DataFrame]: [description]
         """
         candidates = self.get_features(data)
-        emb_data, emb_candidates = self.encode_data(data, candidates)
+        emb_data, emb_candidates = self.encode_data(data.text, candidates)
+        
         
         matrix = []
         
@@ -133,4 +134,6 @@ class bertVectorizer():
             
             matrix.append(text_similarity[0])
 
-        return pd.DataFrame(columns=candidates, data=matrix)
+        dataframe = pd.DataFrame(columns=candidates, data=matrix)
+        
+        return dataframe
