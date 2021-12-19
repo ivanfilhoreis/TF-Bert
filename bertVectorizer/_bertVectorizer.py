@@ -26,6 +26,7 @@ class bertVectorizer():
         
         self.bert_model = bert_model
         self.nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
+        self.model = SentenceTransformer(self.bert_model)
 
     def preprocess_candidates(self, text):
         """[summary]
@@ -107,7 +108,7 @@ class bertVectorizer():
             [type]: [description]
         """
         
-        model = SentenceTransformer(self.bert_model)
+        model = self.model
 
         emb_data = model.encode(data)
         emb_candidates = model.encode(candidates)
