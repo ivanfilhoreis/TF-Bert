@@ -15,6 +15,8 @@ Installation and use can be done as:
 
 # 2. Usage
 
+The most minimal example can be seen below:
+
 ```python
 import pandas as pd
 
