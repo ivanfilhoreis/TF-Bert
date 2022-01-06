@@ -22,12 +22,14 @@ class bertVectorizer():
     """
 
     def __init__(self,
-                bert_model='nli-distilroberta-base-v2') -> None:
+                bert_model='nli-distilroberta-base-v2',
+                n_grams=1) -> None:
         
         self.bert_model = bert_model
+        self.n_grams = n_grams
         self.nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
-
+       
     def preprocess_candidates(self, text):
         """[summary]
 
@@ -72,6 +74,27 @@ class bertVectorizer():
         text = " ".join([word for word in str(text).split() if word not in string.punctuation])
 
         return text
+    
+    def generate_ngrams(self, text):
+        """
+        Parameters
+        ----------
+        text : TYPE
+            DESCRIPTION.
+        n_gram : TYPE, optional
+            DESCRIPTION. The default is 1.
+
+        Returns
+        -------
+        list
+            DESCRIPTION.
+
+        """
+        token = [token for token in text.split(' ') if token != '']
+        
+        ngrams = zip(*[token[i:] for i in range(self.n_grams)])
+        
+        return [' '.join(ngram) for ngram in ngrams]
 
 
     def get_features(self, data):
@@ -86,16 +109,21 @@ class bertVectorizer():
         
         data['clean_text'] = data.text.apply(lambda text: self.preprocess_candidates(text))
         
-        candidates = []
+        candidates = set()
         
+
         for item in data.clean_text:
             doc = self.nlp(item)
             
-            for token in doc:
-                if token.is_alpha and token.lemma_ not in candidates:
-                    candidates.append(token.lemma_)
-        
+            new_sentence = [token.lemma_ for token in doc if token.is_alpha]
+            new_sentence = ' '.join(new_sentence)
+            
+            for words in self.generate_ngrams(new_sentence):
+                candidates.add(words)
+            
         return sorted(candidates)
+    
+    
     
     def encode_data(self, data, candidates):
         """[summary]
