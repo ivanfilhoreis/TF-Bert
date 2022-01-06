@@ -54,10 +54,11 @@ You can also use the `n_grams` parameter to choose the size of features.
 >>> matrix = vectorizer.fit_transform(df)
 >>> matrix.iloc[:, 0:5] # It presents columns from 0 to 5. 
 
-index	additional datum make	algorithm improve automatically 	also know support 	analysis encompass large 	automatically experience use
-0	0.1826			       0.6178					0.0532 		0.2133 			0.3264
-1	0.3270			       0.2543 				0.0613 		0.5349 			0.1611
-2	0.2877			       0.4454 				0.2086 		0.2969 			0.2459
-3	0.2383			       0.3078 				0.0775 		0.1996 			0.2412
-4	0.2899			       0.4197 				0.0285 		0.2368 			0.2773
+index	additional datum make	algorithm improve automatically	also know support	analysis encompass large	automatically experience use
+0	0.1826			0.6178					0.0532			0.2133				0.3264
+1	0.3270			0.2543					0.0613			0.5349				0.1611
+2	0.2877			0.4454					0.2086			0.2969				0.2459
+3	0.2383			0.3078					0.0775			0.1996				0.2412
+4	0.2899			0.4197					0.0285			0.2368				0.2773
+
 ```
