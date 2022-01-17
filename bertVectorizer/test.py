@@ -10,7 +10,7 @@ data = pd.DataFrame({
 })
 
 
-vectorizer = bertVectorizer(n_grams=2)
+vectorizer = bertVectorizer(n_grams=2, clear_texts=True)
 
 matrix = vectorizer.fit_transform(data)
 

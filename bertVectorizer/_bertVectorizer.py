@@ -23,10 +23,12 @@ class bertVectorizer():
 
     def __init__(self,
                 bert_model='nli-distilroberta-base-v2',
-                n_grams=1) -> None:
+                n_grams=1, 
+                clear_texts=True,) -> None:
         
         self.bert_model = bert_model
         self.n_grams = n_grams
+        self.clear_texts = clear_texts
         self.nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
        
@@ -111,15 +113,17 @@ class bertVectorizer():
         
         candidates = set()
         
+        if self.clear_texts is False:
+            data.clean_text = data.text
 
         for item in data.clean_text:
             doc = self.nlp(item)
-            
             new_sentence = [token.lemma_ for token in doc if token.is_alpha]
             new_sentence = ' '.join(new_sentence)
             
             for words in self.generate_ngrams(new_sentence):
                 candidates.add(words)
+        
             
         return sorted(candidates)
     
