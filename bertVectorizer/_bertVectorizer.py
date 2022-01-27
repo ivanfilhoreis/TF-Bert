@@ -8,8 +8,8 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
 import re
-import spacy 
-import string 
+import spacy
+import string
 
 nltk.download('stopwords')
 
@@ -17,29 +17,44 @@ __all__ = ['bertVectorizer']
 
 
 class bertVectorizer():
-    r"""
+    r"""Convert a collection of text documents to a dataframe of token similarity.
+    
+    The algorithm uses a BERT model as a base and to find the similarity between features and text it uses the cosine similarity function. 
 
+    Parameters 
+    ----------
+
+    bert_model : str, default='nli-distilroberta-base-v2'
+        Select bert model to encode data. You can use a transformer model from the sentence-transformers library
+
+    n_grams : int, default=1
+        Inform n_grams to choose the size of features
+
+        You can enter any value greater than zero, the algorithm only generates individual ngrams. 
+
+    clear_texts : bool, default=True
+        Performs a pre-processing on the texts to get the features. 
     """
 
     def __init__(self,
-                bert_model='nli-distilroberta-base-v2',
-                n_grams=1, 
-                clear_texts=True,) -> None:
-        
+                 bert_model='nli-distilroberta-base-v2',
+                 n_grams=1,
+                 clear_texts=True,) -> None:
+
         self.bert_model = bert_model
         self.n_grams = n_grams
         self.clear_texts = clear_texts
         self.nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
-       
+
     def preprocess_candidates(self, text):
-        """[summary]
+        """[Performs a pre-processing on the text]
 
         Args:
-            text([type]): [description]
+            text([str]): [receive a text as a string] 
 
         Returns:
-            [type]: [description]
+            [str]: [returns pre-processed text]
         """
 
         # urls
@@ -67,52 +82,47 @@ class bertVectorizer():
         text = re.sub(r'@\w+', '', text)
 
         # remove hash
-        text = re.sub(r'#\w+', '',text)
+        text = re.sub(r'#\w+', '', text)
 
         # Remove extra white space left while removing stuff
         text = re.sub(r"\s+", " ", text).strip()
-        
-        #remove punctuation 
-        text = " ".join([word for word in str(text).split() if word not in string.punctuation])
+
+        # remove punctuation
+        text = " ".join([word for word in str(text).split()
+                        if word not in string.punctuation])
 
         return text
-    
+
     def generate_ngrams(self, text):
-        """
-        Parameters
-        ----------
-        text : TYPE
-            DESCRIPTION.
-        n_gram : TYPE, optional
-            DESCRIPTION. The default is 1.
-
-        Returns
-        -------
-        list
-            DESCRIPTION.
-
-        """
-        token = [token for token in text.split(' ') if token != '']
-        
-        ngrams = zip(*[token[i:] for i in range(self.n_grams)])
-        
-        return [' '.join(ngram) for ngram in ngrams]
-
-
-    def get_features(self, data):
-        """[summary]
+        """[generating ngrams from text]
 
         Args:
-            data ([type]): [description]
+            text ([str]): [receive a text as a string]
 
         Returns:
-            [type]: [description]
+            [list]: [returns a list of ngrams from the text]
         """
-        
-        data['clean_text'] = data.text.apply(lambda text: self.preprocess_candidates(text))
-        
+        token = [token for token in text.split(' ') if token != '']
+
+        ngrams = zip(*[token[i:] for i in range(self.n_grams)])
+
+        return [' '.join(ngram) for ngram in ngrams]
+
+    def get_features(self, data):
+        """[Get the features from data]
+
+        Args:
+            data ([pandas dataframe]): [receive a dataframe from pandas]
+
+        Returns:
+            [set]: [returns a set of the features]
+        """
+
+        data['clean_text'] = data.text.apply(
+            lambda text: self.preprocess_candidates(text))
+
         candidates = set()
-        
+
         if self.clear_texts is False:
             data.clean_text = data.text
 
@@ -120,26 +130,23 @@ class bertVectorizer():
             doc = self.nlp(item)
             new_sentence = [token.lemma_ for token in doc if token.is_alpha]
             new_sentence = ' '.join(new_sentence)
-            
+
             for words in self.generate_ngrams(new_sentence):
                 candidates.add(words)
-        
-            
+
         return sorted(candidates)
-    
-    
-    
+
     def encode_data(self, data, candidates):
-        """[summary]
+        """[Encode data using BERT]
 
         Args:
-            data ([type]): [description]
-            candidates ([type]): [description]
+            data ([pandas dataframe]): [receive a dataframe from pandas]
+            candidates ([set]): [receive a set with the features]
 
         Returns:
-            [type]: [description]
+            [array numpy]: [returns two arrays from numpy, the first has the encoding of texts and the second has the encoding of features]
         """
-        
+
         model = self.model
 
         emb_data = model.encode(data)
@@ -148,25 +155,26 @@ class bertVectorizer():
         return emb_data, emb_candidates
 
     def fit_transform(self, data):
-        """[summary]
+        """[Transform a sequence of documents to a similarity document dataframe]
 
         Args:
-            data ([type]): [description]
+            data ([pandas dataframe]): [receive a dataframe from pandas]
 
         Returns:
-            [Pandas DataFrame]: [description]
+            [Pandas DataFrame]: [returns a pandas dataframe containing the similarity of the terms with the texts]
         """
+
         candidates = self.get_features(data)
         emb_data, emb_candidates = self.encode_data(data.text, candidates)
-        
-        
+
         matrix = []
-        
+
         for index in range(len(emb_data)):
-            text_similarity = cosine_similarity([emb_data[index]], emb_candidates[0:])
-            
+            text_similarity = cosine_similarity(
+                [emb_data[index]], emb_candidates[0:])
+
             matrix.append(text_similarity[0])
 
         dataframe = pd.DataFrame(columns=candidates, data=matrix)
-        
+
         return dataframe
