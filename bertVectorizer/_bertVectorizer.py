@@ -38,13 +38,15 @@ class bertVectorizer():
 
     def __init__(self,
                  bert_model='nli-distilroberta-base-v2',
+                 language='en_core_web_sm',
                  n_grams=1,
                  clear_texts=True,) -> None:
 
         self.bert_model = bert_model
         self.n_grams = n_grams
         self.clear_texts = clear_texts
-        self.nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
+        #self.nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
+        self.nlp = spacy.load(language, disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
 
     def preprocess_candidates(self, text):
