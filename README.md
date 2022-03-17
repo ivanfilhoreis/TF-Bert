@@ -10,7 +10,10 @@ Installation and use can be done as:
 
 ```python
 !pip install git+https://github.com/ivanfilhoreis/bertVectorizer.git -q
-!pip install -U sentence-transformers -q
+!pip install -U sentence-transformers
+!pip install -U spacy
+!python -m spacy download en_core_web_sm # default language
+
 ```
 
 # 2. Usage
