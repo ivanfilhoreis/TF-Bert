@@ -9,7 +9,7 @@ This implementation produces a non-sparse representation of the text's resource 
 Installation and use can be done as:
 
 ```python
-!pip install git+https://github.com/ivanfilhoreis/bertVectorizer.git -q
+!pip install git+https://github.com/ivanfilhoreis/TF-Bert.git -q
 !pip install -U sentence-transformers
 !pip install -U spacy
 !python -m spacy download en_core_web_sm # default language
