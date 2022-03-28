@@ -15,7 +15,6 @@ nltk.download('stopwords')
 
 __all__ = ['bertVectorizer']
 
-
 class bertVectorizer():
     r"""Convert a collection of text documents to a dataframe of token similarity.
     
@@ -38,15 +37,16 @@ class bertVectorizer():
 
     def __init__(self,
                  bert_model='nli-distilroberta-base-v2',
-                 language='en_core_web_sm',
+                 spacy_lang='en_core_web_sm',
+                 lang='english',
                  n_grams=1,
                  clear_texts=True,) -> None:
 
         self.bert_model = bert_model
         self.n_grams = n_grams
+        self.lang = lang
         self.clear_texts = clear_texts
-        #self.nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
-        self.nlp = spacy.load(language, disable=['parser', 'ner'])
+        self.nlp = spacy.load(spacy_lang, disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
 
     def preprocess_candidates(self, text):
@@ -74,8 +74,8 @@ class bertVectorizer():
         text = re.sub(r'\d+', '', text)
 
         # remove stopwords
-        ", ".join(stopwords.words('english'))
-        STOPWORDS = set(stopwords.words('english'))
+        ", ".join(stopwords.words(self.lang))
+        STOPWORDS = set(stopwords.words(self.lang))
 
         text = " ".join([word for word in str(
             text).split() if word not in STOPWORDS])
