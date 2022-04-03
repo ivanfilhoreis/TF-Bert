@@ -42,7 +42,7 @@ bertVectorizer(bert_model = 'nli-distilroberta-base-v2',
                spacy_lang = 'en_core_web_sm',
                lang       = 'english',
                n_grams    = 1,
-               clear_texts= True) # stopwords of the features
+               clear_texts= True) # remove stopwords from features
 ```
 
 So, you can use `fit_transform` from `bertVectorizer` to convert a collection of raw documents to a matrix extracted from BERT resources:
@@ -61,7 +61,7 @@ index	additional	algorithm	also	analysis	associate	automatically	classification	
 4	0.1428		0.4573		0.0404	0.3019		0.0918		0.1633		0.2108		0.2585		0.2100	0.277	0.1314		0.2244		0.3032		0.2218		0.1391
 ```
 
-You can also use the `n_grams` parameter to choose the size of features.
+You can also use the `n_grams` parameter to choose the size of features or change other parameters (`bert_model`, `spacy_lang`, `lang`) according to the pre-trained bert model and languages.
 
 ```python
 >>> vectorizer = bertVectorizer(n_grams = 3)
