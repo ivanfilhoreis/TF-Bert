@@ -34,7 +34,18 @@ df = pd.DataFrame(dic)
 
 ```
 
-You can use `fit_transform` from `bertVectorizer` to convert a collection of raw documents to a matrix extracted from BERT resources:
+The default parameters of TF-Bert are
+
+```python
+
+bertVectorizer(bert_model = 'nli-distilroberta-base-v2',
+               spacy_lang = 'en_core_web_sm',
+               lang       = 'english',
+               n_grams    = 1,
+               clear_texts= True) # stopwords of the features
+```
+
+So, you can use `fit_transform` from `bertVectorizer` to convert a collection of raw documents to a matrix extracted from BERT resources:
 
 ```python
 >>> from bertVectorizer import bertVectorizer
@@ -53,7 +64,7 @@ index	additional	algorithm	also	analysis	associate	automatically	classification	
 You can also use the `n_grams` parameter to choose the size of features.
 
 ```python
->>> vectorizer = bertVectorizer(n_grams=3)
+>>> vectorizer = bertVectorizer(n_grams = 3)
 >>> matrix = vectorizer.fit_transform(df)
 >>> matrix.iloc[:, 0:5] # It presents columns from 0 to 5. 
 
