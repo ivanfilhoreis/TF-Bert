@@ -50,7 +50,6 @@ class bertVectorizer():
         self.n_grams = n_grams
         self.lang = lang
         self.stp_wrds = stp_wrds
-        self.stp_wrds = stp_wrds
         self.all_features = all_features
         self.nlp = spacy.load(spacy_lang, disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
