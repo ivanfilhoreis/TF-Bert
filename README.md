@@ -23,26 +23,23 @@ The most minimal example can be seen below:
 ```python
 import pandas as pd
 
-dic = {
-       'text': ['Machine learning is the study of computer algorithms that can improve automatically through experience and by the use of data',
-                'Regression analysis encompasses a large variety of statistical methods to estimate the relationship between input variables and their associated features',
-                'Support-vector machines also known as support-vector networks are a set of related supervised learning methods used for classification and regression',
-                'Decision tree learning uses a decision tree as a predictive model to go from observations about an item',
-                'Performing machine learning involves creating a model which is trained on some training data and then can process additional data to make predictions']}
-            
-df = pd.DataFrame(dic)
-
+text = ['Machine learning is the study of computer algorithms that can improve automatically through experience and by the use of data',
+              'Regression analysis encompasses a large variety of statistical methods to estimate the relationship between input variables and their associated features',
+              'Support-vector machines also known as support-vector networks are a set of related supervised learning methods used for classification and regression',
+              'Decision tree learning uses a decision tree as a predictive model to go from observations about an item',
+              'Performing machine learning involves creating a model which is trained on some training data and then can process additional data to make predictions']
 ```
 
 The default parameters of TF-Bert are
 
 ```python
 
-bertVectorizer(bert_model = 'nli-distilroberta-base-v2',
-               spacy_lang = 'en_core_web_sm',
-               lang       = 'english',
-               n_grams    = 1,
-               clear_texts= True) # remove stopwords from features
+bertVectorizer(bert_model='nli-distilroberta-base-v2',
+                 spacy_lang='en_core_web_sm',
+                 lang='english',
+                 n_grams=1,
+                 stp_wrds=True,
+                 all_features=True) # remove stopwords from features
 ```
 
 So, you can use `fit_transform` from `bertVectorizer` to convert a collection of raw documents to a matrix extracted from BERT resources:
@@ -50,7 +47,7 @@ So, you can use `fit_transform` from `bertVectorizer` to convert a collection of
 ```python
 >>> from bertVectorizer import bertVectorizer
 >>> vectorizer = bertVectorizer()
->>> matrix = vectorizer.fit_transform(df)
+>>> matrix = vectorizer.fit_transform(text)
 >>> matrix.iloc[:, 0:15] # It presents columns from 0 to 15. 
 
 index	additional	algorithm	also	analysis	associate	automatically	classification	computer	create	datum	decision	encompass	estimate	experience	feature
@@ -65,7 +62,7 @@ You can also use the `n_grams` parameter to choose the size of features or chang
 
 ```python
 >>> vectorizer = bertVectorizer(n_grams = 3)
->>> matrix = vectorizer.fit_transform(df)
+>>> matrix = vectorizer.fit_transform(text)
 >>> matrix.iloc[:, 0:5] # It presents columns from 0 to 5. 
 
 index	additional datum make	algorithm improve automatically	       also know support	analysis encompass large	automatically experience use
