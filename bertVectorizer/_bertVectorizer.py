@@ -2,6 +2,7 @@
 # Authors: Ivan José dos Reis Filho <ivanfilhoreis@gmail.com>
 #          Luiz Henrique Dutra Martins <luizmartins.uemg@gmail.com>
 
+from multiprocessing.sharedctypes import Value
 import pandas as pd
 import nltk
 from sentence_transformers import SentenceTransformer
@@ -15,9 +16,10 @@ nltk.download('stopwords')
 
 __all__ = ['bertVectorizer']
 
+
 class bertVectorizer():
     r"""Convert a collection of text documents to a dataframe of token similarity.
-    
+
     The algorithm uses a BERT model as a base and to find the similarity between features and text it uses the cosine similarity function. 
 
     Parameters 
@@ -40,12 +42,16 @@ class bertVectorizer():
                  spacy_lang='en_core_web_sm',
                  lang='english',
                  n_grams=1,
-                 clear_texts=True,) -> None:
+                 stp_wrds=True,
+                 all_features=True
+                 ) -> None:
 
         self.bert_model = bert_model
         self.n_grams = n_grams
         self.lang = lang
-        self.clear_texts = clear_texts
+        self.stp_wrds = stp_wrds
+        self.stp_wrds = stp_wrds
+        self.all_features = all_features
         self.nlp = spacy.load(spacy_lang, disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
 
@@ -119,16 +125,30 @@ class bertVectorizer():
         Returns:
             [set]: [returns a set of the features]
         """
+        if isinstance(data, str):
+            raise ValueError(
+                "Iterable over raw text documents expected, string object received."
+            )
+        else:
+            try:
+                data = list(data)
+            except ValueError:
+                print("Data type is invalid.")
 
-        data['clean_text'] = data.text.apply(
-            lambda text: self.preprocess_candidates(text))
+        stp_wrds_clear = []
+
+        if data.__class__.__name__ == 'list':
+            for text in data:
+                stp_wrds_clear.append(self.preprocess_candidates(text))
 
         candidates = set()
 
-        if self.clear_texts is False:
-            data.clean_text = data.text
+        if self.stp_wrds is False:
+            document = data
+        else:
+            document = stp_wrds_clear
 
-        for item in data.clean_text:
+        for item in document:
             doc = self.nlp(item)
             new_sentence = [token.lemma_ for token in doc if token.is_alpha]
             new_sentence = ' '.join(new_sentence)
@@ -138,7 +158,7 @@ class bertVectorizer():
 
         return sorted(candidates)
 
-    def encode_data(self, data, candidates):
+    def encode_data(self, data, candidates=None):
         """[Encode data using BERT]
 
         Args:
@@ -148,6 +168,15 @@ class bertVectorizer():
         Returns:
             [array numpy]: [returns two arrays from numpy, the first has the encoding of texts and the second has the encoding of features]
         """
+        if isinstance(data, str):
+            raise ValueError(
+                "Iterable over raw text documents expected, string object received."
+            )
+
+        if candidates == None:
+            raise ValueError(
+                "A list of candidates was expected, None object received."
+            )
 
         model = self.model
 
@@ -165,9 +194,12 @@ class bertVectorizer():
         Returns:
             [Pandas DataFrame]: [returns a pandas dataframe containing the similarity of the terms with the texts]
         """
-
+        if isinstance(data, str):
+            raise ValueError(
+                "Iterable over raw text documents expected, string object received."
+            )
         candidates = self.get_features(data)
-        emb_data, emb_candidates = self.encode_data(data.text, candidates)
+        emb_data, emb_candidates = self.encode_data(data, candidates)
 
         matrix = []
 
