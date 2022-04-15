@@ -7,9 +7,9 @@ text = ['Machine learning is the study of computer algorithms that can improve a
         'Decision tree learning uses a decision tree as a predictive model to go from observations about an item',
         'Performing machine learning involves creating a model which is trained on some training data and then can process additional data to make predictions']
 
-words = ['study', 'computer', 'algorithms', 'machines', 'networks', 'predictive', 'learning', 'tree', 'additional', 'data', 'regression', 'classification', 'supervised']
+words = ['additional', 'algorithm', 'also', 'analysis', 'associate', 'automatically', 'classification', 'computer', 'create', 'datum', 'decision', 'encompass']
 
-vectorizer = bertVectorizer(stp_wrds=True, all_features=False)
+vectorizer = bertVectorizer(stp_wrds=False, all_features=False, candidates=words)
 
 matrix = vectorizer.fit_transform(text)
 

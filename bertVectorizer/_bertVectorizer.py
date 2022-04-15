@@ -157,7 +157,7 @@ class bertVectorizer():
             for words in self.generate_ngrams(new_sentence):
                 candidates.add(words)
 
-        return sorted(candidates)
+        return sorted(candidates), self.stp_wrds_clear
 
     def encode_data(self, data, candidates=None):
         """[Encode data using BERT]
@@ -186,7 +186,7 @@ class bertVectorizer():
 
         return emb_data, emb_candidates
 
-    def get_similarity(self, emb_data, emb_candidates, candidates):
+    def get_similarity(self, emb_data, emb_candidates, candidates, data):
         """[Get the similarity between texts and features]
 
         Args:
@@ -204,10 +204,15 @@ class bertVectorizer():
 
                 similarity.append(text_similarity[0])
         else:
+            if self.stp_wrds is False:
+                data = data
+            else:
+                data = self.stp_wrds_clear
+
             for index in range(len(emb_data)):
                 aux_index = []
                 for word in candidates:
-                    if word in self.stp_wrds_clear[index]:
+                    if word in data[index]:
                         aux_index.append(candidates.index(word))
 
                 array_embeddings = np.zeros((len(candidates), 768))
@@ -238,12 +243,14 @@ class bertVectorizer():
                     "Iterable over raw candidates list expected, string object received."
                 )
             else:
+                _, _ = self.get_features(data)
                 candidates = sorted(self.candidates)
         else:
-            candidates = self.get_features(data)
+            candidates, _ = self.get_features(data)
 
         emb_data, emb_candidates = self.encode_data(data, candidates)
-        similarity = self.get_similarity(emb_data, emb_candidates, candidates)
+        similarity = self.get_similarity(
+            emb_data, emb_candidates, candidates, data)
 
         dataframe = pd.DataFrame(columns=candidates, data=similarity)
 
