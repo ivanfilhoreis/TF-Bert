@@ -43,7 +43,8 @@ class bertVectorizer():
                  lang='english',
                  n_grams=1,
                  stp_wrds=True,
-                 all_features=True
+                 all_features=True,
+                 candidates=None
                  ) -> None:
 
         self.bert_model = bert_model
@@ -51,6 +52,7 @@ class bertVectorizer():
         self.lang = lang
         self.stp_wrds = stp_wrds
         self.all_features = all_features
+        self.candidates = candidates
         self.nlp = spacy.load(spacy_lang, disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
 
@@ -197,11 +199,21 @@ class bertVectorizer():
             raise ValueError(
                 "Iterable over raw text documents expected, string object received."
             )
-        candidates = self.get_features(data)
+
+        if self.candidates is not None:
+            if isinstance(self.candidates, str):
+                raise ValueError(
+                    "Iterable over raw candidates list expected, string object received."
+                )
+            else:
+                candidates = sorted(self.candidates)
+        else:
+            candidates = self.get_features(data)
+
         emb_data, emb_candidates = self.encode_data(data, candidates)
 
         matrix = []
-
+        aux_features = []
         for index in range(len(emb_data)):
             text_similarity = cosine_similarity(
                 [emb_data[index]], emb_candidates[0:])
