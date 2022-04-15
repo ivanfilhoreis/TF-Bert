@@ -59,15 +59,9 @@ class bertVectorizer():
         self.model = SentenceTransformer(self.bert_model)
 
     def preprocess_candidates(self, text):
-        """[Performs a pre-processing on the text]
-
-        Args:
-            text([str]): [receive a text as a string] 
-
-        Returns:
-            [str]: [returns pre-processed text]
-        """
-
+        '''
+        Cleans the text removing punctuation, stopwords and lemmatizing.
+        '''
         # urls
         url_remove = re.compile(r'https?://\S+|www\.\S+')
         text = url_remove.sub(r'', text)
@@ -105,14 +99,9 @@ class bertVectorizer():
         return text
 
     def generate_ngrams(self, text):
-        """[generating ngrams from text]
-
-        Args:
-            text ([str]): [receive a text as a string]
-
-        Returns:
-            [list]: [returns a list of ngrams from the text]
-        """
+        '''
+        Generates ngrams from a text.
+        '''
         token = [token for token in text.split(' ') if token != '']
 
         ngrams = zip(*[token[i:] for i in range(self.n_grams)])
@@ -120,14 +109,9 @@ class bertVectorizer():
         return [' '.join(ngram) for ngram in ngrams]
 
     def get_features(self, data):
-        """[Get the features from data]
-
-        Args:
-            data ([pandas dataframe]): [receive a dataframe from pandas]
-
-        Returns:
-            [set]: [returns a set of the features]
-        """
+        '''
+        Generates features from a text.
+        '''
         if isinstance(data, str):
             raise ValueError(
                 "Iterable over raw text documents expected, string object received."
@@ -160,15 +144,9 @@ class bertVectorizer():
         return sorted(candidates), self.stp_wrds_clear
 
     def encode_data(self, data, candidates=None):
-        """[Encode data using BERT]
-
-        Args:
-            data ([pandas dataframe]): [receive a dataframe from pandas]
-            candidates ([set]): [receive a set with the features]
-
-        Returns:
-            [array numpy]: [returns two arrays from numpy, the first has the encoding of texts and the second has the encoding of features]
-        """
+        '''
+        Encodes a text using a BERT model.
+        '''
         if isinstance(data, str):
             raise ValueError(
                 "Iterable over raw text documents expected, string object received."
@@ -187,15 +165,9 @@ class bertVectorizer():
         return emb_data, emb_candidates
 
     def get_similarity(self, emb_data, emb_candidates, candidates, data):
-        """[Get the similarity between texts and features]
-
-        Args:
-            emb_data ([array numpy]): [receive an array from numpy]
-            emb_candidates ([array numpy]): [receive an array from numpy]
-
-        Returns:
-            [array numpy]: [returns an array from numpy with the similarity between texts and features]
-        """
+        '''
+        Calculates the similarity between a text and a list of candidates.
+        '''
         similarity = []
         if self.all_features:
             for index in range(len(emb_data)):
@@ -224,14 +196,9 @@ class bertVectorizer():
         return similarity
 
     def fit_transform(self, data):
-        """[Transform a sequence of documents to a similarity document dataframe]
-
-        Args:
-            data ([pandas dataframe]): [receive a dataframe from pandas]
-
-        Returns:
-            [Pandas DataFrame]: [returns a pandas dataframe containing the similarity of the terms with the texts]
-        """
+        '''
+        Encodes a text using a BERT model.
+        '''
         if isinstance(data, str):
             raise ValueError(
                 "Iterable over raw text documents expected, string object received."
