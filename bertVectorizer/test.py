@@ -9,7 +9,7 @@ text = ['Machine learning is the study of computer algorithms that can improve a
 
 words = ['study', 'computer', 'algorithms', 'machines', 'networks', 'predictive', 'learning', 'tree', 'additional', 'data', 'regression', 'classification', 'supervised']
 
-vectorizer = bertVectorizer(stp_wrds=True, candidates=words)
+vectorizer = bertVectorizer(stp_wrds=True, all_features=False)
 
 matrix = vectorizer.fit_transform(text)
 

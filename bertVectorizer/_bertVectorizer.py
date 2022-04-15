@@ -11,6 +11,7 @@ from nltk.corpus import stopwords
 import re
 import spacy
 import string
+import numpy as np
 
 nltk.download('stopwords')
 
@@ -53,6 +54,7 @@ class bertVectorizer():
         self.stp_wrds = stp_wrds
         self.all_features = all_features
         self.candidates = candidates
+        self.stp_wrds_clear = []
         self.nlp = spacy.load(spacy_lang, disable=['parser', 'ner'])
         self.model = SentenceTransformer(self.bert_model)
 
@@ -136,18 +138,16 @@ class bertVectorizer():
             except ValueError:
                 print("Data type is invalid.")
 
-        stp_wrds_clear = []
-
         if data.__class__.__name__ == 'list':
             for text in data:
-                stp_wrds_clear.append(self.preprocess_candidates(text))
+                self.stp_wrds_clear.append(self.preprocess_candidates(text))
 
         candidates = set()
 
         if self.stp_wrds is False:
             document = data
         else:
-            document = stp_wrds_clear
+            document = self.stp_wrds_clear
 
         for item in document:
             doc = self.nlp(item)
@@ -186,6 +186,38 @@ class bertVectorizer():
 
         return emb_data, emb_candidates
 
+    def get_similarity(self, emb_data, emb_candidates, candidates):
+        """[Get the similarity between texts and features]
+
+        Args:
+            emb_data ([array numpy]): [receive an array from numpy]
+            emb_candidates ([array numpy]): [receive an array from numpy]
+
+        Returns:
+            [array numpy]: [returns an array from numpy with the similarity between texts and features]
+        """
+        similarity = []
+        if self.all_features:
+            for index in range(len(emb_data)):
+                text_similarity = cosine_similarity(
+                    [emb_data[index]], emb_candidates[0:])
+
+                similarity.append(text_similarity[0])
+        else:
+            for index in range(len(emb_data)):
+                aux_index = []
+                for word in candidates:
+                    if word in self.stp_wrds_clear[index]:
+                        aux_index.append(candidates.index(word))
+
+                array_embeddings = np.zeros((len(candidates), 768))
+                array_embeddings[aux_index] = emb_candidates[aux_index]
+
+                similarity.append(cosine_similarity(
+                    [emb_data[index]], array_embeddings[0:])[0])
+
+        return similarity
+
     def fit_transform(self, data):
         """[Transform a sequence of documents to a similarity document dataframe]
 
@@ -211,15 +243,8 @@ class bertVectorizer():
             candidates = self.get_features(data)
 
         emb_data, emb_candidates = self.encode_data(data, candidates)
+        similarity = self.get_similarity(emb_data, emb_candidates, candidates)
 
-        matrix = []
-        aux_features = []
-        for index in range(len(emb_data)):
-            text_similarity = cosine_similarity(
-                [emb_data[index]], emb_candidates[0:])
-
-            matrix.append(text_similarity[0])
-
-        dataframe = pd.DataFrame(columns=candidates, data=matrix)
+        dataframe = pd.DataFrame(columns=candidates, data=similarity)
 
         return dataframe
