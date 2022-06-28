@@ -1,4 +1,4 @@
-# TF-BERT
+# TD-BERT
 
 Convert a collection of raw documents to a matrix extracted from BERT resources. 
 
