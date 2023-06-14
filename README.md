@@ -14,7 +14,7 @@ The textual representation $D$ with sentence transformers is defined as $DS = ([
   <img src="https://github.com/ivanfilhoreis/td_bert/blob/main/img/tdBERT.png" width="700px" alt="table2"/>
 </p>
 
-The matrix values correspond to the cosine distance of each term in each document, \textit{i.e.}, $c(B_k, W_b)$ equals the distance between vectors $W_j$ and $B_i$. The vector values $DS$ and $TS$ are assigned according to a pre-trained BERT model. 
+The matrix values correspond to the cosine distance of each term in each document, i.e., $c(B_k, W_b)$ equals the distance between vectors $W_j$ and $B_i$. The vector values $DS$ and $TS$ are assigned according to a pre-trained BERT model. 
 
 ## 2. Installation
 
