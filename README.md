@@ -79,14 +79,14 @@ index	additional datum make	algorithm improve automatically	       also know sup
 If you use TD-BERT in your research, please cite it using the following BibTex entry
 
 ```
-@InProceedings{10.1007/978-3-031-21686-2_12,
-author="Filho, Ivan J. Reis
+@InProceedings{ref:ReisFilho2022,
+author="Reis Filho, Ivan J.
         and Martins, Luiz H. D.
         and Parmezan, Antonio R. S.
         and Marcacini, Ricardo M.
         and Rezende, Solange O.",
 editor="Xavier-Junior, Jo{\~a}o Carlos
-and Rios, Ricardo Ara{\'u}jo",
+        and Rios, Ricardo Ara{\'u}jo",
 title="Sequential Short-Text Classification from Multiple Textual Representations with Weak Supervision",
 booktitle="Intelligent Systems",
 year="2022",
