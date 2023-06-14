@@ -4,7 +4,12 @@ Convert a collection of raw documents to a matrix extracted from BERT resources.
 
 This implementation produces a non-sparse representation of the text's resource count.
 
-# 1. Installation
+# 1. Method
+
+We implemented the proposed approach to obtain a new textual representation that considers the semantic features. First, we extract a collection of documents $D = [d_1, d_2, ..., d_k]$ containing $k$ documents and a set $T = [w_1, w_2, ..., w_b]$ with $b$ terms from $D$. This process is similar to the one used in BoW. However, we take into account here the sentence transformers of the pre-trained BERT models to obtain the cosine distance of each term in each document.
+
+
+# 2. Installation
 
 Installation and use can be done as:
 
