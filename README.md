@@ -4,12 +4,19 @@ Convert a collection of raw documents to a matrix extracted from BERT resources.
 
 This implementation produces a non-sparse representation of the text's resource count.
 
-# 1. Method
+## 1. Text vector representation model: TD-BERT
 
 We implemented the proposed approach to obtain a new textual representation that considers the semantic features. First, we extract a collection of documents $D = [d_1, d_2, ..., d_k]$ containing $k$ documents and a set $T = [w_1, w_2, ..., w_b]$ with $b$ terms from $D$. This process is similar to the one used in BoW. However, we take into account here the sentence transformers of the pre-trained BERT models to obtain the cosine distance of each term in each document.
 
+The textual representation $D$ with sentence transformers is defined as $DS = ([B_1], [B_2], ... [B_k])$, where each $B$ is a BERT vector of $h$ positions representing a document $d$ at time $t$. The representation of Terms with the sentence transformers is defined as $TS = ([W_1], [W_2], ... [W_b])$, where $W_j$ is a BERT vector of $h$ positions that represents a term $w_j$. The set of documents is represented as a document-term matrix constituted by cosine distance $c$ from each vector $k$ composed of $b$ dimensions, as depicted Figure below:
 
-# 2. Installation
+<p align="center">
+  <img src="https://github.com/ivanfilhoreis/td_bert/blob/main/img/tdBERT.png" width="700px" alt="table2"/>
+</p>
+
+The matrix values correspond to the cosine distance of each term in each document, \textit{i.e.}, $c(B_k, W_b)$ equals the distance between vectors $W_j$ and $B_i$. The vector values $DS$ and $TS$ are assigned according to a pre-trained BERT model. 
+
+## 2. Installation
 
 Installation and use can be done as:
 
@@ -21,7 +28,7 @@ Installation and use can be done as:
 
 ```
 
-# 2. Usage
+## 3. Usage
 
 The most minimal example can be seen below:
 
@@ -79,7 +86,7 @@ index	additional datum make	algorithm improve automatically	       also know sup
 
 ```
 
-# 3. Citing
+## 4. Citing
 
 If you use TD-BERT in your research, please cite it using the following BibTex entry
 
