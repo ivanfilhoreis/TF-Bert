@@ -1,6 +1,6 @@
 # TD-BERT
 
-Convert a collection of raw documents to a matrix extracted from BERT resources. 
+Convert a collection of raw documents to a matrix extracted from BERT resources. This approach contemplates a vector text representation model based on BoW that adopts a distance measure between Terms and Documents from pre-trained BERT models called TD-BERT.
 
 This implementation produces a non-sparse representation of the text's resource count.
 
